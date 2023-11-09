@@ -1,4 +1,5 @@
 import ply.lex as lex
+from ply.lex import TOKEN 
 import sys
 import ply.yacc as yacc
 
@@ -6,7 +7,9 @@ class lexertt(object):
 
 	tokens = (
 		'NUMBER',
-		'ID',
+		'EQUAL',
+		'PRINT',
+		'STRING',
 		'PLUS',
 		'MINUS',
 		'TIMES',
@@ -24,6 +27,10 @@ class lexertt(object):
 	t_DIVIDE  = r'/'
 	t_LPAREN  = r'\('
 	t_RPAREN  = r'\)'
+	t_EQUAL  = r'\='
+	t_PRINT  = r'print'
+	
+	nondigit         = r'([_A-Za-z]+)'
 
 
 	def __init__(self,**kwargs):
@@ -35,14 +42,15 @@ class lexertt(object):
 		t.value = int(t.value)    
 		return t
 
-	def t_ID(self,t):
-		r'[a-zA-Z][a-zA-Z_0-9]*\s'
-		if t.value in self.reserved:
-			t.type = self.reserved[t.value]
-		else:
-			t.type =  "ID"
-		return t
+	def t_whitespace(self,t):
+		r'\s+'
+		pass
 
+	@TOKEN(nondigit)
+	def t_STRING(self,t):
+		t.type="STRING"
+		t.value= str(t.value)
+		return t
 
 	def t_newline(self,t):
 		r'\n+'
@@ -66,8 +74,6 @@ class lexertt(object):
 
 if __name__ == "__main__":
 	data = '''
-	3 + 4 * 10
-	  + -20 *2
 	a = 2
 	'''
 	lexer = lexertt()
